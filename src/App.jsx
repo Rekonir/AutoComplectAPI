@@ -12,7 +12,6 @@ function App() {
   const fetchData = () => {
     setArticles([]);
     const url = `https://www.japarts.ru/?id=ws;action=search3;login=${login};pass=${password};makename=mitsubishi;detailnum=${number};cross=1;crosslimit=10;rowlimit=5;`;
-
     axios({
       method: "get",
       url: url,
@@ -26,10 +25,10 @@ function App() {
   };
   const addToCart = (priceId) => {
     const id = priceId;
-    const url = `https://www.japarts.ru/?id=ws;action=addtobasket2;login=${login};pass=${password};priceid=${id};quantity=10;clientprice=100;comment=test;`;
+    const urlAdd = `https://www.japarts.ru/?id=ws;action=addtobasket2;login=${login};pass=${password};priceid=${id};quantity=10;clientprice=100;comment=test;`;
     axios({
       method: "get",
-      url: url,
+      url: urlAdd,
       responseType: "json",
     })
       .then((data) => data.data)
@@ -37,13 +36,10 @@ function App() {
         console.log(data);
       })
       .catch((err) => console.log(err));
-  };
-  const veiwCart = () => {
-    const url = `https://www.japarts.ru/?id=ws;action=showbasket;login=${login};pass=${password}`;
-
+    const urlVeiw = `https://www.japarts.ru/?id=ws;action=showbasket;login=${login};pass=${password}`;
     axios({
       method: "get",
-      url: url,
+      url: urlVeiw,
       responseType: "json",
     })
       .then((data) => data.data)
@@ -51,6 +47,33 @@ function App() {
         console.log(data), setCart(data);
       })
       .catch((err) => console.log(err), setCart([]));
+  };
+  // const veiwCart = () => {
+  //   const url = `https://www.japarts.ru/?id=ws;action=showbasket;login=${login};pass=${password}`;
+  //   axios({
+  //     method: "get",
+  //     url: url,
+  //     responseType: "json",
+  //   })
+  //     .then((data) => data.data)
+  //     .then((data) => {
+  //       console.log(data), setCart(data);
+  //     })
+  //     .catch((err) => console.log(err), setCart([]));
+  // };
+  const delFromCart = (id) => {
+    const url = `https://www.japarts.ru/?id=ws;action=delfrombasket;login=${login};pass=${password};basketidm=${id}`;
+    axios({
+      method: "get",
+      url: url,
+      responseType: "json",
+    })
+      .then((data) => data.data)
+      .then((data) => {
+        console.log(data),
+          setCart(cart.filter((item) => item.basketid !== data[0].basketid));
+      })
+      .catch((err) => console.log(err));
   };
 
   // const unifyingCart = (cart) => {
@@ -101,10 +124,11 @@ function App() {
         onChange={(e) => setNumber(e.target.value)}
       />
       <button onClick={fetchData}>Поиск</button>
-      <button onClick={veiwCart}> Показать корзину</button>
+      {/* <button onClick={veiwCart}> Показать корзину</button> */}
       <div className="Catalog">
         <div className="cart">
-          {cart.length !== 0 &&
+          Корзина:
+          {cart.length !== 0 ? (
             cart.map((position, index) => (
               <div className="positionBox" key={position.basketid}>
                 <p>№ {index + 1}</p>
@@ -124,11 +148,18 @@ function App() {
                 <p className="time">
                   Доставим за: {position.time} дней из {position.country}
                 </p>
+                <button onClick={() => delFromCart(position.basketid)}>
+                  Удалить
+                </button>
               </div>
-            ))}
+            ))
+          ) : (
+            <p> Вы еще ничего не заказали </p>
+          )}
         </div>
 
         <div className="search">
+          Результаты поиска:
           {articles.length !== 0 &&
             articles.map((article) =>
               article.error === "NO RESULTS FOUND" ? (
