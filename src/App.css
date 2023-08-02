@@ -53,9 +53,6 @@
   flex-direction: column;
   gap: 5px;
 }
-.cart{
-  width: 35%;
-}
 
 @keyframes logo-spin {
   from {
